@@ -1,0 +1,995 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ARGUS-Lite - 舆情审核系统</title>
+
+<style>
+
+:root{--bg0:#0b0e17;--bg1:#141a2b;--bg2:#1a2236;--bg3:#1f2a42;--bd:#2a3456;--tx0:#e8edf5;--tx1:#8896b6;--tx2:#5a6888;--ac:#7c8ef0;--sg:#4ade80;--da:#f87171;--wa:#fbbf24;--sw:220px}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{font-family:Inter,-apple-system,Segoe UI,system-ui,sans-serif;background:var(--bg0);color:var(--tx0);min-height:100vh;display:flex}
+
+::-webkit-scrollbar{width:6px}
+
+::-webkit-scrollbar-track{background:var(--bg0)}
+
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+.sb{width:var(--sw);background:var(--bg1);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+
+.sb-l{padding:20px 20px 16px;border-bottom:1px solid var(--bd)}
+
+.sb-l h1{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
+
+.sb-l h1 .a{color:var(--ac)}
+
+.sb-l .sub{font-size:11px;color:var(--tx2);letter-spacing:2px;margin-top:2px}
+
+.sb-n{flex:1;padding:12px 0}
+
+.ni{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--tx1);font-size:14px;cursor:pointer;transition:all .15s;border-left:2px solid transparent}
+
+.ni:hover{background:var(--bg3);color:var(--tx0)}
+
+.ni.a{background:rgba(124,142,240,0.15);color:var(--ac);border-left-color:var(--ac)}
+
+.ni .b{margin-left:auto;background:var(--da);color:white;font-size:11px;padding:1px 8px;border-radius:10px;font-weight:600}
+
+.sb-f{padding:16px 20px;border-top:1px solid var(--bd);font-size:12px;color:var(--tx2)}
+
+.mn{margin-left:var(--sw);flex:1}
+
+.tb{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;border-bottom:1px solid var(--bd);background:var(--bg1)}
+
+.tb h2{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px}
+
+.tb .bp{background:var(--ac);color:white;border:none;padding:8px 20px;border-radius:6px;font-weight:600;font-size:13px;cursor:pointer}
+
+.tb .bp:hover{background:#6a7de0}
+
+.ct{padding:24px 32px}
+
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+
+.sc{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 20px}
+
+.sc .l{font-size:12px;color:var(--tx2);letter-spacing:1px}
+
+.sc .v{font-size:28px;font-weight:700;margin-top:4px}
+
+.sc .v.h{color:var(--da)}.sc .v.m{color:var(--wa)}.sc .v.l{color:var(--sg)}.sc .v.t{color:var(--ac)}
+
+.tl{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+
+.tl select,.tl input{background:var(--bg2);border:1px solid var(--bd);color:var(--tx0);padding:8px 14px;border-radius:6px;font-size:13px;outline:none}
+
+.tl select:focus,.tl input:focus{border-color:var(--ac)}
+
+.rl{display:flex;flex-direction:column;gap:12px}
+
+.cd{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;transition:all .2s}
+
+.cd:hover{border-color:#3a4a7a}
+
+.cm{padding:14px 20px;cursor:pointer}
+
+.cm:hover{background:var(--bg3)}
+
+.ctp{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+
+.ctp .t{font-size:15px;font-weight:600;color:var(--tx0);flex:1;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.ctp .pb{flex-shrink:0;padding:2px 12px;border-radius:12px;font-size:12px;font-weight:600;margin-left:12px}
+
+.ph{background:rgba(248,113,113,0.15);color:var(--da)}
+
+.pm{background:rgba(251,191,36,0.15);color:var(--wa)}
+
+.pl{background:rgba(74,222,128,0.15);color:var(--sg)}
+
+.ctg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+
+.tg{display:inline-flex;align-items:center;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:500}
+
+.tw{background:rgba(248,113,113,0.12);color:var(--da)}
+
+.tb2{background:rgba(74,222,128,0.12);color:var(--sg)}
+
+.tp{background:rgba(251,191,36,0.12);color:var(--wa)}
+
+.tx{background:rgba(124,142,240,0.12);color:var(--ac)}
+
+.tg2{background:rgba(124,142,240,0.08);color:var(--tx1)}
+
+.cm2{display:flex;gap:16px;font-size:12px;color:var(--tx2);flex-wrap:wrap}
+
+.cm2 s{display:flex;align-items:center;gap:4px}
+
+.reason-line{font-size:11px;color:var(--tx2);margin-top:4px;font-style:italic}
+
+.pb2{height:3px;background:var(--bd)}
+
+.pf{height:100%;transition:width .5s}
+
+.em{text-align:center;padding:80px 20px}
+
+.em .ic{font-size:48px;margin-bottom:16px;opacity:.3}
+
+.em h3{font-size:18px;color:var(--tx1);margin-bottom:8px}
+
+.em p{font-size:14px;color:var(--tx2)}
+
+.mo{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+
+.md{position:fixed;z-index:1001;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--bg2);border:1px solid var(--bd);border-radius:16px;width:90%;max-width:720px;max-height:90vh;overflow-y:auto;display:none}
+
+.mh{padding:20px 24px 16px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg2);z-index:1}
+
+.mh h3{font-size:16px;font-weight:600;flex:1;padding-right:16px}
+
+.mc{padding:20px 24px}
+
+.ms{margin-bottom:20px}
+
+.ms h4{font-size:12px;color:var(--tx2);margin-bottom:6px;letter-spacing:1px;display:flex;align-items:center;gap:6px}
+
+.ms .v,.ms pre{font-size:14px;color:var(--tx0);line-height:1.6;white-space:pre-wrap;word-break:break-all}
+
+.ms pre{background:var(--bg3);padding:12px;border-radius:8px;max-height:200px;overflow-y:auto;font-size:13px}
+
+.ms a{color:var(--ac);text-decoration:none}
+
+.ms a:hover{text-decoration:underline}
+
+.ms .tag-list{display:flex;gap:6px;flex-wrap:wrap}
+
+.ms .tag-item{padding:3px 12px;border-radius:4px;font-size:12px;font-weight:500}
+
+.mf{padding:16px 24px 20px;border-top:1px solid var(--bd);display:flex;gap:12px;align-items:center;position:sticky;bottom:0;background:var(--bg2)}
+
+.mf input{flex:1;background:var(--bg3);border:1px solid var(--bd);color:var(--tx0);padding:8px 14px;border-radius:6px;font-size:13px;outline:none}
+
+.mf input:focus{border-color:var(--ac)}
+
+.mb2{background:var(--sg);color:#0b0e17;border:none;padding:8px 24px;border-radius:6px;font-weight:600;font-size:13px;cursor:pointer}
+
+.mb2.r{background:var(--da);color:white}
+
+.cc{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+.ts{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 20px;border-radius:8px;font-weight:600;font-size:14px;animation:tsIn .3s}
+
+@keyframes tsIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.ts-s{background:var(--sg);color:#0b0e17}
+
+.ts-e{background:var(--da);color:white}
+
+@media(max-width:768px){.sg{grid-template-columns:repeat(2,1fr)}.cc{grid-template-columns:1fr}}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sb">
+
+  <div class="sb-l">
+
+    <h1><span class="a">ARGUS</span>-Lite</h1>
+
+    <div class="sub">RSSHub → DeepSeek 舆情审核</div>
+
+  </div>
+
+  <div class="sb-n">
+
+    <div class="ni a" onclick="showPage('review')" id="nav-review"><span>📋</span> 审核列表 <span class="b" id="pending-count">0</span></div>
+
+    <div class="ni" onclick="showPage('collect')" id="nav-collect"><span>📡</span> 数据采集</div>
+
+    <div class="ni" onclick="showPage('stats')" id="nav-stats"><span>📊</span> 统计分析</div>
+
+    <div class="ni" onclick="showPage('settings')" id="nav-settings"><span>⚙️</span> 设置</div>
+
+  </div>
+
+  <div class="sb-f">ARGUS-Lite v2.0<br>RSSHub + DeepSeek 驱动</div>
+
+</div>
+
+
+
+<div class="mn">
+
+<div class="tb">
+
+  <h2 id="page-title">舆情审核列表</h2>
+
+  <div style="display:flex;gap:8px">
+
+    <button class="bp" onclick="triggerConsume()">🤖 DeepSeek 处理</button>
+
+    <button class="bp" onclick="triggerCollect()">📡 RSSHub 采集</button>
+
+  </div>
+
+</div>
+
+<div class="ct">
+
+
+
+<!-- 审核列表页 -->
+
+<div id="page-review">
+
+  <div class="sg">
+
+    <div class="sc"><div class="l">总数据</div><div class="v t" id="stat-total">0</div></div>
+
+    <div class="sc"><div class="l">待审核</div><div class="v h" id="stat-pending">0</div></div>
+
+    <div class="sc"><div class="l">已通过</div><div class="v l" id="stat-approved">0</div></div>
+
+    <div class="sc"><div class="l">已拒绝</div><div class="v m" id="stat-rejected">0</div></div>
+
+  </div>
+
+  <div class="tl">
+
+    <select id="filter-category" onchange="load()">
+
+      <option value="">全部分类</option>
+
+      <option value="public-opinion">舆情</option>
+
+      <option value="vulnerability">漏洞</option>
+
+      <option value="phishing">钓鱼</option>
+
+      <option value="threat-intel">威胁情报</option>
+
+      <option value="tech-news">科技资讯</option>
+
+      <option value="policy">政策法规</option>
+
+      <option value="finance">财经</option>
+
+      <option value="entertainment">娱乐</option>
+
+      <option value="other">其他</option>
+
+    </select>
+
+    <select id="filter-reviewed" onchange="load()">
+
+      <option value="pending">待审核</option>
+
+      <option value="done">已审核</option>
+
+      <option value="">全部</option>
+
+    </select>
+
+  </div>
+
+  <div class="rl" id="review-list"></div>
+
+</div>
+
+
+
+<!-- 数据采集页 -->
+
+<div id="page-collect" style="display:none">
+
+  <div class="cc">
+
+    <div class="cd2" style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 20px">
+
+      <h3 style="font-size:14px;margin-bottom:12px;color:var(--tx1)">📡 RSSHub 采集流水线</h3>
+
+      <div style="font-size:13px;color:var(--tx1);line-height:2">
+
+        <div>📡 RSSHub → feedparser 定时拉取</div>
+
+        <div>💾 原始数据 → Redis 队列</div>
+
+        <div>🤖 DeepSeek API → AI 分析研判</div>
+
+        <div>🗄️ 结果 → SQLite 存储</div>
+
+        <div>👁️ Web 界面 → 人工审核</div>
+
+      </div>
+
+      <button class="bp" onclick="triggerCollect()" style="width:100%;margin-top:16px">📡 立即采集 RSSHub</button>
+
+      <button class="bp" onclick="triggerConsume()" style="width:100%;margin-top:8px">🤖 立即 DeepSeek 处理</button>
+
+    </div>
+
+    <div class="cd2" style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 20px">
+
+      <h3 style="font-size:14px;margin-bottom:12px;color:var(--tx1)">📊 系统状态</h3>
+
+      <div id="system-status" style="font-size:13px;color:var(--tx1);line-height:2">
+
+        <div>? 加载中...</div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 统计分析页 -->
+
+<div id="page-settings" style="display:none">
+
+<div class="tb"><h2>AI 分析配置</h2></div>
+
+<div class="ct" style="max-width:600px">
+
+<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:24px">
+
+<div style="margin-bottom:20px"><label style="font-size:13px;color:var(--tx1);display:block;margin-bottom:6px">API 地址</label>
+
+<input id="ai-api-url" type="url" placeholder="https://api.deepseek.com" style="width:100%;background:var(--bg3);border:1px solid var(--bd);color:var(--tx0);padding:10px 14px;border-radius:6px;font-size:14px;outline:none"></div>
+
+<div style="margin-bottom:20px"><label style="font-size:13px;color:var(--tx1);display:block;margin-bottom:6px">API 密钥</label>
+
+<input id="ai-api-key" type="password" placeholder="sk-..." style="width:100%;background:var(--bg3);border:1px solid var(--bd);color:var(--tx0);padding:10px 14px;border-radius:6px;font-size:14px;outline:none"></div>
+
+<div style="margin-bottom:24px"><label style="font-size:13px;color:var(--tx1);display:block;margin-bottom:6px">模型名称</label>
+
+<input id="ai-model" type="text" placeholder="deepseek-chat" style="width:100%;background:var(--bg3);border:1px solid var(--bd);color:var(--tx0);padding:10px 14px;border-radius:6px;font-size:14px;outline:none"></div>
+
+<div style="margin-bottom:16px"><label style="font-size:13px;color:var(--tx1);display:block;margin-bottom:6px">配置名称（保存后可在下方切换）</label>
+
+<input id="ai-config-name" type="text" placeholder="deepseek" style="width:100%;background:var(--bg3);border:1px solid var(--bd);color:var(--tx0);padding:10px 14px;border-radius:6px;font-size:14px;outline:none"></div>
+
+<div style="display:flex;gap:12px;align-items:center">
+
+<button onclick="saveAiConfig()" style="background:var(--ac);color:white;border:none;padding:10px 28px;border-radius:6px;font-weight:600;font-size:14px;cursor:pointer">保存配置</button>
+
+<button onclick="testAiConfig()" style="background:var(--bg3);color:var(--tx0);border:1px solid var(--bd);padding:10px 28px;border-radius:6px;font-weight:600;font-size:14px;cursor:pointer">测试连接</button>
+
+<span id="ai-config-status" style="font-size:13px;color:var(--tx2);margin-left:8px"></span>
+
+</div>
+
+<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)">
+
+<div style="font-size:13px;color:var(--tx1);margin-bottom:10px;font-weight:600">已保存的配置</div>
+
+<div id="preset-list" style="font-size:13px;color:var(--tx2)">暂无保存的配置</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="page-stats" style="display:none">
+
+  <div class="cc">
+
+    <div class="cd2" style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 20px">
+
+      <h3 style="font-size:14px;margin-bottom:12px;color:var(--tx1)">📊 分类分布</h3>
+
+      <div id="category-stats"></div>
+
+    </div>
+
+    <div class="cd2" style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 20px">
+
+      <h3 style="font-size:14px;margin-bottom:12px;color:var(--tx1)">📈 来源分布</h3>
+
+      <div id="platform-stats"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+</div>
+
+</div>
+
+
+
+<!-- 详情弹窗 -->
+
+<div class="mo" id="modal-overlay" onclick="closeModal()"></div>
+
+<div class="md" id="modal-detail">
+
+  <div class="mh">
+
+    <h3 id="modal-title">加载中...</h3>
+
+    <span style="cursor:pointer;font-size:20px;color:var(--tx2);flex-shrink:0" onclick="closeModal()">✖</span>
+
+  </div>
+
+  <div class="mc" id="modal-body"></div>
+
+  <div class="mf">
+
+    <input type="text" id="reject-reason" placeholder="拒绝原因（可选）">
+
+    <button class="mb2" onclick="handleAction('approve')">✓ 通过</button>
+
+    <button class="mb2 r" onclick="handleAction('reject')">✗ 拒绝</button>
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+let allItems = [];
+
+let currentId = null;
+
+
+
+function showPage(page) {
+
+  document.querySelectorAll('.mn .ct > div[id^="page-"]').forEach(el => el.style.display = 'none');
+
+  document.querySelectorAll('.ni').forEach(el => el.classList.remove('a'));
+
+  document.getElementById('page-' + page).style.display = 'block';
+
+  document.getElementById('nav-' + page).classList.add('a');
+
+  const titles = {review: '舆情审核列表', collect: '数据采集流水线', stats: '统计分析', settings: 'AI 分析配置'};
+
+  document.getElementById('page-title').textContent = titles[page];
+
+  if (page === 'stats') loadStats();
+
+  if (page === 'review') load();
+
+  if (page === 'collect') loadStatus();
+  if (page === 'settings') loadAiConfig();
+
+}
+
+
+
+async function load() {
+
+  const category = document.getElementById('filter-category').value;
+
+  const reviewed = document.getElementById('filter-reviewed').value;
+
+  const params = new URLSearchParams({category, reviewed});
+
+  try {
+
+    const res = await fetch('/api/reviews?' + params);
+
+    allItems = await res.json();
+
+    renderList();
+
+    updatePending();
+
+    loadStats();
+
+  } catch(e) { console.error(e); }
+
+}
+
+
+
+const CAT_COLORS = {
+
+  'public-opinion': {bg:'rgba(248,113,113,0.12)',color:'var(--da)',label:'舆情'},
+
+  'vulnerability': {bg:'rgba(251,191,36,0.12)',color:'var(--wa)',label:'漏洞'},
+
+  'phishing': {bg:'rgba(248,113,113,0.12)',color:'var(--da)',label:'钓鱼'},
+
+  'threat-intel': {bg:'rgba(124,142,240,0.12)',color:'var(--ac)',label:'威胁情报'},
+
+  'tech-news': {bg:'rgba(74,222,128,0.12)',color:'var(--sg)',label:'科技资讯'},
+
+  'policy': {bg:'rgba(124,142,240,0.12)',color:'var(--ac)',label:'政策法规'},
+
+  'finance': {bg:'rgba(251,191,36,0.12)',color:'var(--wa)',label:'财经'},
+
+  'entertainment': {bg:'rgba(74,222,128,0.12)',color:'var(--sg)',label:'娱乐'},
+
+  'other': {bg:'rgba(136,150,182,0.12)',color:'var(--tx1)',label:'其他'},
+
+};
+
+
+
+function renderList() {
+
+  const list = document.getElementById('review-list');
+
+  if (allItems.length === 0) {
+
+    list.innerHTML = '<div class="em"><div class="ic">📭</div><h3>暂无数据</h3><p>点击右上角"RSSHub 采集"获取最新情报</p></div>';
+
+    return;
+
+  }
+
+  list.innerHTML = '<div class="rl">' + allItems.map(item => {
+
+    const p = item.confidence || 0;
+
+    const cat = CAT_COLORS[item.category] || CAT_COLORS.other;
+
+    const pc = p >= 80 ? 'ph' : p >= 60 ? 'pm' : 'pl';
+
+    const status = item.reviewed ? (item.decision === 'approved' ? '✓ 已通过' : '✗ 已拒绝') : '⏳ 待审核';
+
+    const tags = (item.tags || []).slice(0, 3);
+
+    
+
+    return '<div class="cd"><div class="cm" onclick="openDetail(\'' + item.id + '\')">' +
+
+      '<div class="ctp"><div class="t">' + (item.title || '无标题') + '</div>' +
+
+      '<div class="pb ' + pc + '">' + p + '%</div></div>' +
+
+      '<div class="ctg">' +
+
+      '<span class="tg" style="background:' + cat.bg + ';color:' + cat.color + '">' + cat.label + '</span>' +
+
+      '<span class="tg tb2">' + (item.platform || '?') + '</span>' +
+
+      '<span class="tg tp">' + status + '</span>' +
+
+      tags.map(t => '<span class="tg tx">' + t + '</span>').join('') + '</div>' +
+
+      '<div class="cm2">' +
+
+      '<s>\U0001f550 ' + new Date(item.collected || Date.now()).toLocaleString() + '</s>' +
+
+      '<s>[情感] ' + item.sentiment + '</s></div>' +
+
+      (item.reason ? '<div class="reason-line">📌 ' + item.reason.slice(0, 80) + '</div>' : '') +
+
+      '</div>' +
+
+      '<div class="pb2"><div class="pf" style="width:' + p + '%;background:' + (p >= 80 ? '#f87171' : p >= 60 ? '#fbbf24' : '#4ade80') + '"></div></div></div>';
+
+  }).join('') + '</div>';
+
+}
+
+
+
+function updatePending() {
+
+  const pending = allItems.filter(i => !i.reviewed).length;
+
+  document.getElementById('pending-count').textContent = pending;
+
+}
+
+
+
+async function openDetail(id) {
+
+  currentId = id;
+
+  try {
+
+    const res = await fetch('/api/review/' + id);
+
+    const item = await res.json();
+
+    const cat = CAT_COLORS[item.category] || CAT_COLORS.other;
+
+    
+
+    document.getElementById('modal-title').textContent = item.title || '详情';
+
+    
+
+    const tags = (item.tags || []).map(t =>
+
+      '<span class="tag-item tx" style="background:rgba(124,142,240,0.12);color:var(--ac)">' + t + '</span>'
+
+    ).join('');
+
+    
+
+    document.getElementById('modal-body').innerHTML =
+
+      // 📋 基本信息
+
+      '<div class="ms"><h4>📋 来源信息</h4>' +
+
+      '<div class="v">平台：<b>' + (item.platform || '-') + '</b> | 来源：<b>' + (item.source || '-') + '</b></div>' +
+
+      (item.url ? '<div class="v" style="margin-top:4px">-> <a href="' + item.url + '" target="_blank">' + item.url + '</a></div>' : '') +
+
+      (item.author ? '<div class="v" style="margin-top:4px">🕐 ?? ' + item.author + '</div>' : '') +
+
+      '<div class="v" style="margin-top:4px">👤 ' + (item.published || '-') + ' | 采集: ' + new Date(item.collected || Date.now()).toLocaleString() + '</div></div>' +
+
+
+
+      // 📌 推送原因
+
+      (item.reason ? '<div class="ms"><h4>📌 推送原因</h4><div class="v">' + item.reason + '</div></div>' : '') +
+
+
+
+      // 📝 内容
+
+      '<div class="ms"><h4>📝 内容</h4><pre>' + (item.content || '-') + '</pre></div>' +
+
+
+
+      // 🤖 AI 分析结果
+
+      '<div class="ms" style="background:var(--bg3);padding:16px;border-radius:10px">' +
+
+      '<h4 style="color:var(--ac)">🤖 AI 分析研判</h4>' +
+
+      '<div style="margin-top:8px"><b>分类：</b><span class="tag-item" style="background:' + cat.bg + ';color:' + cat.color + '">' + cat.label + '</span>' +
+
+      ' | <b>置信度：</b><span style="color:' + (item.confidence >= 80 ? 'var(--da)' : item.confidence >= 60 ? 'var(--wa)' : 'var(--sg)') + '">' + (item.confidence || 0) + '%</span>' +
+
+      ' | <b>情感：</b><span>' + (item.sentiment || 'neutral') + '</span></div>' +
+
+      (tags ? '<div style="margin-top:8px"><b>标签：</b>' + tags + '</div>' : '') +
+
+      (item.ai_analysis ? '<div style="margin-top:10px"><b>📝 分析摘要：</b><br>' + item.ai_analysis + '</div>' : '') +
+
+      (item.ai_reasoning ? '<div style="margin-top:10px"><b>🤖 研判逻辑：</b><br>' + item.ai_reasoning + '</div>' : '') +
+
+      '</div>' +
+
+
+
+      // ✓ 审核结果
+
+      (item.reviewed ? '<div class="ms"><h4>✓ 审核结果</h4><div class="v">' +
+
+        (item.decision === 'approved' ? '✓ 已通过' : '✗ 已拒绝') +
+
+        ' by ' + (item.reviewer || '-') +
+
+        (item.reject_reason ? '<br>原因：' + item.reject_reason : '') +
+
+        '</div></div>' : '');
+
+    
+
+    document.getElementById('modal-overlay').style.display = 'block';
+
+    document.getElementById('modal-detail').style.display = 'block';
+
+    document.getElementById('reject-reason').value = '';
+
+  } catch(e) { console.error(e); }
+
+}
+
+
+
+function closeModal() {
+
+  document.getElementById('modal-overlay').style.display = 'none';
+
+  document.getElementById('modal-detail').style.display = 'none';
+
+  currentId = null;
+
+}
+
+
+
+async function handleAction(action) {
+
+  if (!currentId) return;
+
+  const reason = document.getElementById('reject-reason').value;
+
+  try {
+
+    const res = await fetch('/api/review/' + currentId, {
+
+      method: 'POST',
+
+      headers: {'Content-Type': 'application/json'},
+
+      body: JSON.stringify({action, reviewer: 'admin', reason}),
+
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    showToast(action === 'approve' ? '✓ 已通过' : '✗ 已拒绝', 'success');
+
+    closeModal();
+
+    load();
+
+  } catch(e) { showToast('✗ 操作失败: ' + e.message, 'error'); }
+
+}
+
+
+
+async function triggerCollect() {
+
+  showToast('📡 采集开始...', 'success');
+
+  try {
+
+    const res = await fetch('/api/collect', {method: 'POST'});
+
+    const data = await res.json();
+
+    showToast('? ' + (data.message || '完成'), 'success');
+
+    load();
+
+  } catch(e) { showToast('✗ 采集失败: ' + e.message, 'error'); }
+
+}
+
+
+
+async function triggerConsume() {
+
+  showToast('🤖 DeepSeek 处理中...', 'success');
+
+  try {
+
+    const res = await fetch('/api/collect/consume', {method: 'POST'});
+
+    const data = await res.json();
+
+    showToast('✓ DeepSeek 处理完成', 'success');
+
+    load();
+
+  } catch(e) { showToast('✗ 处理失败: ' + e.message, 'error'); }
+
+}
+
+
+
+async function loadStats() {
+
+  try {
+
+    const res = await fetch('/api/stats');
+
+    const stats = await res.json();
+
+    document.getElementById('stat-total').textContent = stats.total;
+
+    document.getElementById('stat-pending').textContent = stats.pending;
+
+    document.getElementById('stat-approved').textContent = stats.approved;
+
+    document.getElementById('stat-rejected').textContent = stats.rejected;
+
+
+
+    const catDiv = document.getElementById('category-stats');
+
+    const cats = stats.by_category || {};
+
+    catDiv.innerHTML = Object.entries(cats).map(([k, v]) =>
+
+      '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px">' +
+
+      '<span>' + (CAT_COLORS[k] ? CAT_COLORS[k].label : k) + '</span>' +
+
+      '<span style="color:var(--ac);font-weight:600">' + v + '</span></div>'
+
+    ).join('') || '<div style="font-size:13px;color:var(--tx2)">暂无数据</div>';
+
+
+
+    const platDiv = document.getElementById('platform-stats');
+
+    const plats = stats.by_platform || {};
+
+    platDiv.innerHTML = Object.entries(plats).map(([k, v]) =>
+
+      '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px">' +
+
+      '<span>' + k + '</span><span style="color:var(--wa);font-weight:600">' + v + '</span></div>'
+
+    ).join('') || '<div style="font-size:13px;color:var(--tx2)">暂无数据</div>';
+
+  } catch(e) { console.error(e); }
+
+}
+
+
+
+async function loadStatus() {
+
+  document.getElementById('system-status').innerHTML =
+
+    '<div>📡 RSSHub: <span style="color:var(--sg)">已配置</span></div>' +
+
+    '<div>💾 Redis: <span style="color:var(--sg)">排队中</span></div>' +
+
+    '<div>🤖 DeepSeek: <span style="color:var(--sg)">待处理</span></div>' +
+
+    '<div>🕐 采集间隔: 4 小时</div>';
+
+}
+
+
+
+function showToast(msg, type) {
+
+  const t = document.createElement('div');
+
+  t.className = 'ts ts-' + (type === 'success' ? 's' : 'e');
+
+  t.textContent = msg;
+
+  document.body.appendChild(t);
+
+  setTimeout(() => t.remove(), 3000);
+
+}
+
+
+
+load();
+
+loadStats();
+
+setInterval(load, 30000);
+
+
+
+async function loadAiConfig() {
+
+  try {
+
+    const r = await fetch('/api/ai-config');
+
+    const d = await r.json();
+
+    document.getElementById('ai-api-url').value = d.api_url || '';
+
+    document.getElementById('ai-api-key').value = d.api_key || '';
+
+    document.getElementById('ai-model').value = d.model || '';
+
+    renderPresets(d.presets || []);
+
+  } catch(e) {}
+
+}
+
+async function renderPresets(presets) {
+  const el = document.getElementById('preset-list');
+  if (!el) return;
+  if (!presets || presets.length === 0) {
+    el.innerHTML = '<div style="color:var(--tx2)">暂无保存的配置</div>';
+    return;
+  }
+  el.innerHTML = presets.map(p => {
+    const active = p.active ? 'style="border-left:3px solid var(--ac);background:rgba(124,142,240,0.1)"' : '';
+    return '<div ' + active + ' style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:6px;margin-bottom:6px;border:1px solid var(--bd);cursor:pointer" onclick="loadPreset(\' + p.name + \')">' +
+      '<div><b>' + p.name + '</b>' + (p.active ? ' <span style="color:var(--sg);font-size:11px">● 当前</span>' : '') + '<br>' +
+      '<span style="font-size:11px;color:var(--tx2)">' + (p.api_url || '') + ' | ' + (p.model || '') + '</span></div>' +
+      '<span style="font-size:11px;color:var(--da);cursor:pointer;padding:4px 8px" onclick="event.stopPropagation();deletePreset(\' + p.name + \')">删除</span></div>';
+  }).join('');
+}
+
+async function loadPreset(name) {
+  try {
+    const r = await fetch('/api/ai-load/' + encodeURIComponent(name), {method:'POST'});
+    const d = await r.json();
+    if (d.status === 'ok') {
+      showToast('已切换到: ' + name, 'success');
+      loadAiConfig();
+    }
+  } catch(e) { showToast('切换失败', 'error'); }
+}
+
+async function deletePreset(name) {
+  if (!confirm('确认删除配置 "' + name + '" ？')) return;
+  try {
+    const r = await fetch('/api/ai-presets/' + encodeURIComponent(name), {method:'DELETE'});
+    const d = await r.json();
+    if (d.status === 'ok') {
+      showToast('已删除: ' + name, 'success');
+      loadAiConfig();
+    }
+  } catch(e) { showToast('删除失败', 'error'); }
+}
+
+async function saveAiConfig() {
+
+  const u = document.getElementById('ai-api-url').value.trim();
+
+  const k = document.getElementById('ai-api-key').value.trim();
+
+  const m = document.getElementById('ai-model').value.trim() || 'deepseek-chat';
+
+  const n = document.getElementById('ai-config-name').value.trim() || '';
+
+  if (!u || !k) { showToast('请填写 API 地址和密钥', 'error'); return; }
+
+  if (!n) { showToast('请填写配置名称（如 deepseek、qwen）', 'error'); return; }
+
+  document.getElementById('ai-config-status').textContent = '保存中...';
+
+  try {
+
+    const r = await fetch('/api/ai-config', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({api_url:u, api_key:k, model:m, name:n})});
+
+    const d = await r.json();
+
+    if (d.status === 'ok') { showToast('已保存: ' + (d.name || n), 'success'); loadAiConfig(); }
+
+    document.getElementById('ai-config-status').textContent = '';
+
+  } catch(e) { showToast('保存失败', 'error'); document.getElementById('ai-config-status').textContent = ''; }
+
+}
+
+async function testAiConfig() {
+  const u = document.getElementById('ai-api-url').value.trim();
+  const k = document.getElementById('ai-api-key').value.trim();
+  const m = document.getElementById('ai-model').value.trim() || 'deepseek-chat';
+  if (!u || !k) { showToast('请先填写 API 地址和密钥', 'error'); return; }
+  document.getElementById('ai-config-status').textContent = '测试中...';
+  try {
+    const r = await fetch('/api/ai-test', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({api_url:u, api_key:k, model:m})});
+    const d = await r.json();
+    if (d.status === 'ok') { showToast('连接成功', 'success'); document.getElementById('ai-config-status').textContent = '成功'; }
+    else { showToast(d.message || 'API 错误', 'error'); document.getElementById('ai-config-status').textContent = '失败'; }
+  } catch(e) { showToast('连接失败: ' + e.message, 'error'); document.getElementById('ai-config-status').textContent = '失败'; }
+}
+
+loadAiConfig();
+
+</script>
+
+</body>
+
+</html>

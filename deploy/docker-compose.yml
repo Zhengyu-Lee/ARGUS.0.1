@@ -1,0 +1,52 @@
+﻿# ARGUS-Lite 部署 - RSSHub + Redis + DeepSeek 流水线
+services:
+  # ── RSSHub（自部署RSS聚合）──
+  rsshub:
+    image: diygod/rsshub:latest
+    ports:
+      - "1200:1200"
+    environment:
+      - NODE_ENV=production
+      - CACHE_TYPE=redis
+      - REDIS_URL=redis://redis:6379/
+      - RATE_LIMIT=0  # 关闭限流
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # ── Redis 消息队列 ──
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - argus-redis:/data
+    restart: unless-stopped
+
+  # ── 审核 Web 界面 ──
+  review-web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.python
+    ports:
+      - "8090:8090"
+    depends_on:
+      - redis
+      - rsshub
+    environment:
+      - DATABASE_URL=sqlite:////app/data/argus.db
+      - REDIS_URL=redis://redis:6379/0
+      - RSSHUB_BASE=http://rsshub:1200
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - DEEPSEEK_API_URL=${DEEPSEEK_API_URL:-https://api.deepseek.com/v1/chat/completions}
+      - DEEPSEEK_MODEL=${DEEPSEEK_MODEL:-deepseek-chat}
+      - COLLECT_INTERVAL_HOURS=4
+      - SECRET_KEY=change-this-in-production
+      - PORT=8090
+    volumes:
+      - argus-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  argus-data:
+  argus-redis:

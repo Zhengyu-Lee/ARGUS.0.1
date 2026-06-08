@@ -1,0 +1,18 @@
+{
+  "api_url": "https://api.deepseek.com/v1",
+  "api_key": "sk-158fffdbad00452295c3efd71497b756",
+  "model": "deepseek-v4-flash",
+  "presets": {
+    "deepseek": {
+      "api_url": "https://api.deepseek.com/v1",
+      "api_key": "sk-test-ds",
+      "model": "deepseek-v4-flash"
+    },
+    "qwen": {
+      "api_url": "http://172.18.1.40:40002/v1",
+      "api_key": "sk-qwen-test",
+      "model": "Qwen3.6-27B"
+    }
+  },
+  "active_key": "deepseek"
+}

@@ -1,0 +1,96 @@
+﻿rules:
+  # 鈹€鈹€ 鍐呭鍖归厤瑙勫垯 鈹€鈹€
+
+  - name: cve-detection
+    description: "鍛戒腑 CVE 缂栧彿锛屾彁鍗囩疆淇″害锛屾帹鍏ュ€欓€夐槦鍒?
+    when:
+      matches_regex: "CVE-\\d{4}-\\d{4,}"
+    then:
+      add_tag: ["vulnerability"]
+      boost_confidence: 30
+      publish_to: "ioc-candidate"
+
+  - name: ip-port-c2
+    description: "鏆楃綉/榛戝璁哄潧涓嚭鐜?IP:Port 鏍煎紡锛岀枒浼?C2"
+    when:
+      matches_regex: "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{2,5}"
+      source_is: ["darkweb", "hacker-forum"]
+    then:
+      add_tag: ["c2"]
+      boost_confidence: 25
+      publish_to: "ioc-candidate"
+      trigger_alert_if: "> 80"
+
+  - name: hash-indicator
+    description: "鍖呭惈鏂囦欢鍝堝笇锛屽彲鑳芥槸鎭舵剰鏍锋湰"
+    when:
+      matches_regex: "\\b[a-fA-F0-9]{32,64}\\b"
+    then:
+      add_tag: ["hash-indicator"]
+      boost_confidence: 15
+      publish_to: "ioc-candidate"
+
+  - name: email-phishing
+    description: "鍑虹幇鍦ㄥ畨鍏ㄤ笂涓嬫枃涓殑閭"
+    when:
+      matches_regex: "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b"
+      source_is: ["darkweb", "hacker-forum"]
+    then:
+      add_tag: ["phishing"]
+      boost_confidence: 20
+      publish_to: "ioc-candidate"
+
+  # 鈹€鈹€ 缃俊搴﹁矾鐢辫鍒欙紙鎸夐『搴忓尮閰嶏級鈹€鈹€
+
+  - name: high-confidence-auto-push
+    description: "缃俊搴?>= 80锛岃嚜鍔ㄦ帹鍏?MISP + OpenCTI"
+    when:
+      confidence: ">= 80"
+    then:
+      publish_to: "ioc-confirmed"
+
+  - name: medium-confidence-review
+    description: "缃俊搴?60-79锛岃繘鍏ヤ汉宸ュ鏍搁槦鍒?
+    when:
+      confidence: "60-79"
+    then:
+      publish_to: "human-review"
+
+  - name: low-confidence-store
+    description: "缃俊搴?< 60锛屼粎瀛樺叆 ES"
+    when:
+      confidence: "< 60"
+    then:
+      publish_to: "es-store"
+
+  # 舆情监控规则
+  - name: opinion-high-probability
+    description: "舆情概率 >= 70，直接推入人工审核"
+    when:
+      source_is: ["opinion-monitor"]
+      opinion_probability: ">= 70"
+    then:
+      add_tag: ["public-opinion", "needs-review"]
+      boost_confidence: 70
+      publish_to: "human-review"
+      needs_review: true
+
+  - name: opinion-medium-probability
+    description: "舆情概率 50-69，存入 ES 标记观察"
+    when:
+      source_is: ["opinion-monitor"]
+      opinion_probability: "50-69"
+    then:
+      add_tag: ["public-opinion", "watch"]
+      boost_confidence: 50
+      publish_to: "es-store"
+
+  - name: opinion-low-probability
+    description: "舆情概率 < 50，仅存档"
+    when:
+      source_is: ["opinion-monitor"]
+      opinion_probability: "< 50"
+    then:
+      add_tag: ["public-opinion", "low-impact"]
+      boost_confidence: 30
+      publish_to: "es-store"
